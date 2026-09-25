@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Take It Easy · Drop 01</title>
+  <meta name="description" content="Drop 01 de Take It Easy, entre potes : un t-shirt à 20 €, un soleil qui fait la sieste.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#ECE4DD" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#2F2922" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="mascot-ink.png">
+  <!-- Prototype : Google Fonts via <link>. En production, auto-héberger. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="tee-front.webp">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Sans animation : réduction des mouvements demandée. Le CSS bascule alors sur une mise en page statique.
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("static");
+  </script>
+</head>
+<body>
+
+  <!-- Interface aux quatre coins, en mix-blend difference : lisible sur l'écru comme sur l'encre -->
+  <div class="corners" aria-label="Navigation">
+    <a class="corner corner--tl brand" href="#top" aria-label="Take It Easy, haut de page">
+      <img src="mascot-paper.png" alt="" width="30" height="30">
+      <span>Take It Easy</span>
+    </a>
+    <nav class="corner corner--tr" aria-label="Sections">
+      <a href="#tee">Le t-shirt</a>
+      <a href="#details">Les détails</a>
+      <a href="#commander">Commander</a>
+    </nav>
+    <p class="corner corner--bl">Drop 01, entre potes</p>
+    <a class="corner corner--br cta" href="#commander" data-order>Commander</a>
+  </div>
+
+  <main>
+
+    <!-- 1. HERO : le nom de la marque éclate, le t-shirt reste au centre -->
+    <section class="hero" id="top">
+      <div class="hero__pin">
+        <h1 class="hero__title" aria-label="Take it easy. Drop 01.">
+          <span class="w w1" aria-hidden="true">Take</span>
+          <span class="w w2" aria-hidden="true">it</span>
+          <span class="w w3" aria-hidden="true">easy</span>
+        </h1>
+        <div class="hero__visual">
+          <picture class="sun hero__sun" aria-hidden="true">
+            <source srcset="mascot-paper.png" media="(prefers-color-scheme: dark)">
+            <img src="mascot-mid.png" alt="" width="986" height="975">
+          </picture>
+          <img class="hero__tee" src="tee-front.webp" width="1244" height="1070"
+               alt="T-shirt noir délavé Take It Easy, logo écru avec le soleil allongé">
+        </div>
+        <p class="hero__sub">Drop 01, entre potes. Un t-shirt, un soleil qui fait la sieste. 20 €.</p>
+      </div>
+    </section>
+
+    <!-- 2. LE RALENTI : le texte se révèle au rythme du scroll, et le scroll lui-même s'alourdit -->
+    <section class="slow" id="slow">
+      <div class="slow__pin">
+        <h2 class="slow__title">Ici, même le scroll fait la sieste.</h2>
+        <p class="slow__text" data-words>Take It Easy, ce sont des vêtements simples, un peu d’humour et zéro pression. Une pièce sort quand elle est prête. Pas avant.</p>
+        <picture class="slow__sun" aria-hidden="true">
+          <source srcset="mascot-paper.png" media="(prefers-color-scheme: dark)">
+          <img src="mascot-ink.png" alt="" width="986" height="975" loading="lazy">
+        </picture>
+      </div>
+    </section>
+
+    <!-- 3. LE RETOURNEMENT : le scroll fait pivoter le t-shirt, devant puis dos -->
+    <section class="flip" id="tee">
+      <div class="flip__pin">
+        <picture class="sun flip__sun" aria-hidden="true">
+          <source srcset="mascot-paper.png" media="(prefers-color-scheme: dark)">
+          <img src="mascot-mid.png" alt="" width="986" height="975" loading="lazy">
+        </picture>
+        <div class="flip__card">
+          <img class="flip__face flip__face--front" src="tee-front.webp" width="1244" height="1070" loading="lazy"
+               alt="Devant du t-shirt : logo Take It Easy écru, soleil allongé">
+          <img class="flip__face flip__face--back" src="tee-back.webp" width="1247" height="1056" loading="lazy"
+               alt="Dos du t-shirt : Take it easy, I’m drunk. en capitales écrues">
+        </div>
+        <h2 class="flip__line flip__line--a">Devant,<br>le soleil.</h2>
+        <h2 class="flip__line flip__line--b">Dans le dos,<br>l’excuse.</h2>
+      </div>
+    </section>
+
+    <!-- 4. LES DÉTAILS : défilement horizontal, le soleil roule en bas de l'écran -->
+    <section class="pan" id="details">
+      <div class="pan__track">
+        <div class="pan__panel pan__panel--intro">
+          <h2 class="pan__intro">Les détails,<br>sans se presser.</h2>
+        </div>
+        <div class="pan__panel"><p class="pan__label">Prix</p><p class="pan__value">20 €</p></div>
+        <div class="pan__panel"><p class="pan__label">Coloris, au vote</p><p class="pan__value">Noir ou<br>délavé ?</p></div>
+        <div class="pan__panel"><p class="pan__label">Impression</p><p class="pan__value">Écru, devant<br>et dos</p></div>
+        <div class="pan__panel"><p class="pan__label">Tailles</p><p class="pan__value">S à XL</p></div>
+        <div class="pan__panel"><p class="pan__label">Pour qui</p><p class="pan__value">Entre<br>potes</p></div>
+      </div>
+      <picture class="pan__sun" aria-hidden="true">
+        <source srcset="mascot-paper.png" media="(prefers-color-scheme: dark)">
+        <img src="mascot-ink.png" alt="" width="986" height="975" loading="lazy">
+      </picture>
+    </section>
+
+    <!-- 5. L'ÉCLIPSE : le soleil grossit jusqu'à couvrir l'écran, la page bascule en négatif -->
+    <section class="eclipse" aria-hidden="true">
+      <div class="eclipse__pin">
+        <p class="eclipse__text eclipse__text--a">Le soleil</p>
+        <picture class="eclipse__sun">
+          <source srcset="mascot-paper.png" media="(prefers-color-scheme: dark)">
+          <img src="mascot-ink.png" alt="" width="986" height="975" loading="lazy">
+        </picture>
+        <p class="eclipse__text eclipse__text--b">se couche.</p>
+      </div>
+    </section>
+
+    <!-- 6. COMMANDER : en négatif -->
+    <section class="drop" id="commander">
+      <h2 class="drop__title">C’est sorti.</h2>
+      <p class="drop__price">20 €</p>
+      <p class="drop__text">Prénom, nom, ton WhatsApp ou ton Insta, ta taille. Et tu votes : noir ou noir délavé.</p>
+      <a class="btn btn--xl" href="#commander" data-order>Commander</a>
+      <p class="drop__note">On te recontacte pour le paiement et la remise.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <picture class="footer__logo">
+      <source srcset="logo-ink.png" media="(prefers-color-scheme: dark)">
+      <img src="logo-paper.png" alt="Take It Easy" width="733" height="658" loading="lazy">
+    </picture>
+    <div class="footer__meta">
+      <a href="#">Instagram</a>
+      <p>© 2026 Take It Easy</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
