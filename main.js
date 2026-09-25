@@ -1,101 +1,147 @@
-// Take It Easy · Drop 01, v2
-// Lien du Google Form de commande.
+// Take It Easy · Drop 01, v3 (iPhone d'abord)
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeRAXIo-5ImMQ70oDJS4Eqf9tK5iCcpBdAebWFijH7gV5J2zw/viewform";
 
 const root = document.documentElement;
 
-/* ---------- boutons « Commander » ---------- */
-if (FORM_URL) {
-  document.querySelectorAll("[data-order]").forEach((a) => {
-    a.href = FORM_URL;
-    a.target = "_blank";
-    a.rel = "noopener";
-  });
-}
+// Champs du formulaire pré-remplis par les choix faits sur la page
+const ENTRY_SIZE = "entry.656410188";
+const ENTRY_COLOR = "entry.996950959";
+const choice = { size: null, color: null };
 
-/* ---------- mots du ralenti ---------- */
+/* ---------- boutons « Commander » : lien vers le formulaire, pré-rempli si l'on a choisi ---------- */
+const orderLinks = document.querySelectorAll("[data-order]");
+function updateOrderLinks() {
+  const params = new URLSearchParams();
+  if (choice.size) params.set(ENTRY_SIZE, choice.size);
+  if (choice.color) params.set(ENTRY_COLOR, choice.color);
+  const url = params.toString() ? `${FORM_URL}?usp=pp_url&${params}` : FORM_URL;
+  orderLinks.forEach((a) => { a.href = url; });
+  const label = document.querySelector(".buy > span");
+  if (label) label.textContent = choice.size ? `Commander · ${choice.size}` : "Commander";
+}
+orderLinks.forEach((a) => { a.target = "_blank"; a.rel = "noopener"; });
+updateOrderLinks();
+
+/* ---------- choix de la taille et vote pour la couleur ---------- */
+function radioGroup(selector, key, onPick) {
+  const buttons = document.querySelectorAll(selector);
+  buttons.forEach((btn) => btn.addEventListener("click", () => {
+    const value = btn.dataset[key];
+    const same = choice[key] === value;
+    choice[key] = same ? null : value;
+    buttons.forEach((b) => b.setAttribute("aria-checked", String(!same && b === btn)));
+    onPick?.(choice[key]);
+    updateOrderLinks();
+  }));
+}
+radioGroup(".size", "size");
+radioGroup(".swatch", "color", (c) => root.classList.toggle("tint-noir", c === "Noir"));
+
+/* ---------- découpage : mots du manifeste, lettres de « l'excuse. » ---------- */
 document.querySelectorAll("[data-words]").forEach((el) => {
   el.innerHTML = el.textContent.trim().split(/\s+/).map((w) => `<span class="word">${w}</span>`).join(" ");
 });
+document.querySelectorAll(".drunk").forEach((el) => {
+  el.innerHTML = [...el.textContent].map((c) => `<span class="ch">${c}</span>`).join("");
+});
 
-/* ---------- scrollytelling ---------- */
+/* ---------- la nuit : barre et bouton s'inversent ; bouton flottant masqué près du prix final ---------- */
+const buy = document.querySelector(".buy");
+let nightFromSunset = false;
+let nightFromOrder = false;
+const syncNight = () => root.classList.toggle("dark-zone", nightFromSunset || nightFromOrder);
+
+new IntersectionObserver(([e]) => { buy.classList.toggle("is-away", e.isIntersecting || e.boundingClientRect.top < 0); }, { rootMargin: "0px 0px -20% 0px" })
+  .observe(document.querySelector(".order__price"));
+new IntersectionObserver(([e]) => {
+  nightFromOrder = e.isIntersecting || e.boundingClientRect.top < 0;
+  syncNight();
+}, { rootMargin: "-60px 0px -100% 0px" }).observe(document.querySelector(".order"));
+
+/* ---------- animations ---------- */
 if (!window.gsap || !window.ScrollTrigger) root.classList.add("static");
 
 if (!root.classList.contains("static")) {
   gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.config({ ignoreMobileResize: true });
 
-  // Scroll doux ; son inertie change dans la section « ralenti »
-  const lenis = window.Lenis ? new Lenis({ lerp: 0.1 }) : null;
-  if (lenis) {
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add((t) => lenis.raf(t * 1000));
-    gsap.ticker.lagSmoothing(0);
-  }
-  document.querySelectorAll('a[href^="#"]').forEach((a) => {
-    a.addEventListener("click", (e) => {
-      const target = a.getAttribute("href");
-      if (target.length < 2 || !lenis) return;
-      e.preventDefault();
-      lenis.scrollTo(target === "#top" ? 0 : target, { duration: 1.6 });
+  // Entrée : le titre monte, le t-shirt tombe (c'est un drop), le badge claque
+  gsap.from(".line > span", { yPercent: 105, duration: 1.1, ease: "expo.out", stagger: 0.1 });
+  gsap.from(".hero__drop", { y: "-55vh", rotation: 16, duration: 1.5, ease: "back.out(1.15)", delay: 0.15 });
+  gsap.from(".hero__badge", { scale: 0, rotation: -30, duration: 0.7, ease: "back.out(2)", delay: 1.2 });
+  gsap.from(".bar", { autoAlpha: 0, y: -10, duration: 0.8, ease: "expo.out", delay: 0.9 });
+
+  // Hero au scroll : le nom s'écarte, le t-shirt se redresse, le soleil tourne
+  gsap.timeline({ scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 0.4 } })
+    .to(".l1 > span", { xPercent: -22, ease: "none" }, 0)
+    .to(".l2 > span", { xPercent: 12, ease: "none" }, 0)
+    .to(".hero__tee", { rotation: 7, scale: 1.06, ease: "none" }, 0)
+    .to(".hero__sun img", { rotation: 110, ease: "none" }, 0);
+
+  // Manifeste : les mots s'allument, le soleil roule depuis le bord
+  gsap.to(".manifesto__text .word", {
+    opacity: 1, stagger: 0.08, ease: "none",
+    scrollTrigger: { trigger: ".manifesto__text", start: "top 82%", end: "bottom 50%", scrub: 0.3 },
+  });
+  gsap.fromTo(".manifesto__sun", { xPercent: 60, rotation: -90 }, {
+    xPercent: 0, rotation: 30, ease: "none",
+    scrollTrigger: { trigger: ".manifesto", start: "top bottom", end: "bottom 60%", scrub: 0.3 },
+  });
+
+  // Retournement : chaque face pivote seule jusqu'à 90° (jamais de texte en miroir, fiable sur Safari)
+  gsap.set(".face", { transformPerspective: 1000 });
+  gsap.set(".face--back", { rotationY: -90, autoAlpha: 0 });
+  gsap.set(".cap--b", { autoAlpha: 0, y: 30 });
+  const wobble = () => gsap.fromTo(".drunk .ch",
+    { rotation: 0, y: 0 },
+    { rotation: "random(-9, 9)", y: "random(-6, 6)", duration: 0.28, ease: "sine.inOut", yoyo: true, repeat: 3, stagger: 0.025, overwrite: true });
+  let wobbled = false;
+  gsap.timeline({
+    scrollTrigger: {
+      trigger: ".flip", start: "top top", end: "bottom bottom", scrub: 0.4,
+      onUpdate: (self) => { if (!wobbled && self.progress > 0.62) { wobbled = true; wobble(); } },
+    },
+  })
+    .to(".flip__sun img", { rotation: -180, ease: "none", duration: 1 }, 0)
+    .to(".face--front", { rotationY: 90, ease: "power2.in", duration: 0.2 }, 0.3)
+    .set(".face--front", { autoAlpha: 0 }, 0.5)
+    .set(".face--back", { autoAlpha: 1 }, 0.5)
+    .to(".face--back", { rotationY: 0, ease: "power2.out", duration: 0.2 }, 0.5)
+    .to(".cap--a", { autoAlpha: 0, y: -40, ease: "none", duration: 0.12 }, 0.36)
+    .to(".cap--b", { autoAlpha: 1, y: 0, ease: "none", duration: 0.12 }, 0.52);
+
+  // Détails : la carte recouverte recule et s'assombrit (voile, pas de transparence)
+  const cards = gsap.utils.toArray(".card");
+  cards.forEach((card, i) => {
+    const next = cards[i + 1];
+    if (!next) return;
+    gsap.to(card, {
+      scale: 0.93, "--dim": 0.3, ease: "none",
+      scrollTrigger: { trigger: next, start: "top bottom", end: "top 30%", scrub: 0.3 },
     });
   });
 
-  const fg = getComputedStyle(root).getPropertyValue("--fg").trim();
-
-  // 1. Hero : entrée, le t-shirt tombe (c'est un drop)
-  gsap.from(".w", { yPercent: 50, autoAlpha: 0, duration: 1.3, ease: "expo.out", stagger: 0.09 });
-  gsap.from(".hero__visual", { y: "-70vh", rotation: 14, duration: 1.6, ease: "back.out(1.1)", delay: 0.2 });
-  gsap.from(".hero__sub", { autoAlpha: 0, y: 16, duration: 1, delay: 0.9, ease: "expo.out" });
-
-  // 1. Hero au scroll : le nom éclate, le produit reste
-  gsap.timeline({ scrollTrigger: { trigger: ".hero", start: "top top", end: "+=140%", pin: true, scrub: 1 } })
-    .to(".w1", { xPercent: -85, ease: "none" }, 0)
-    .to(".w2", { xPercent: 160, ease: "none" }, 0)
-    .to(".w3", { xPercent: 70, ease: "none" }, 0)
-    .to(".hero__tee", { scale: 1.18, rotation: 6, ease: "none" }, 0)
-    .to(".hero__sun img", { rotation: 150, ease: "none" }, 0)
-    .to(".hero__sub", { autoAlpha: 0, y: -30, ease: "none", duration: 0.3 }, 0);
-
-  // 2. Le ralenti : le texte se révèle mot à mot, le soleil se lève, le scroll devient lourd
+  // Coucher de soleil : la phrase se lit, puis le soleil passe sous l'horizon et la nuit tombe
+  const night = getComputedStyle(root).getPropertyValue("--night").trim();
   gsap.timeline({
     scrollTrigger: {
-      trigger: ".slow", start: "top top", end: "+=200%", pin: true, scrub: 1,
-      onToggle: (self) => { if (lenis) lenis.options.lerp = self.isActive ? 0.025 : 0.1; },
+      trigger: ".sunset", start: "top top", end: "bottom bottom", scrub: 0.4,
+      onUpdate: (self) => { const n = self.progress > 0.53; if (n !== nightFromSunset) { nightFromSunset = n; syncNight(); } },
+      onLeave: () => { nightFromSunset = true; syncNight(); },
+      onLeaveBack: () => { nightFromSunset = false; syncNight(); },
     },
   })
-    .to(".slow__text .word", { opacity: 1, stagger: 0.1, ease: "none" }, 0)
-    .fromTo(".slow__sun", { yPercent: 0 }, { yPercent: -150, rotation: 40, ease: "none" }, 0);
+    .fromTo(".sunset__sun", { scale: 1 }, { scale: 1.2, ease: "none", duration: 0.15 }, 0)
+    .to(".sunset__sun", { yPercent: 85, rotation: 25, ease: "power2.in", duration: 0.37 }, 0.15)
+    .set(".sunset__stage", { backgroundColor: night }, 0.535)
+    .to(".sunset__text", { color: "#ECE4DD", duration: 0.01 }, 0.535)
+    .to(".sunset__horizon", { backgroundColor: "#ECE4DD", duration: 0.01 }, 0.535)
+    .set(".sunset__sun img", { attr: { src: "mascot-paper.png" } }, 0.535)
+    .to({}, { duration: 0.4 }, 0.6);
 
-  // 3. Le retournement : le scroll fait pivoter le t-shirt
-  gsap.set(".flip__line--b", { autoAlpha: 0, y: 40 });
-  gsap.timeline({ scrollTrigger: { trigger: ".flip", start: "top top", end: "+=220%", pin: true, scrub: 1 } })
-    .fromTo(".flip__card", { rotateY: 0 }, { rotateY: 180, ease: "power2.inOut", duration: 1 }, 0.1)
-    .to(".flip__sun img", { rotation: -180, ease: "none", duration: 1.2 }, 0)
-    .to(".flip__line--a", { autoAlpha: 0, y: -40, duration: 0.2 }, 0.45)
-    .to(".flip__line--b", { autoAlpha: 1, y: 0, duration: 0.2 }, 0.6);
-
-  // 4. Les détails : défilement horizontal, le soleil roule d'un bord à l'autre
-  const track = document.querySelector(".pan__track");
-  const panSun = document.querySelector(".pan__sun");
-  const distance = () => track.scrollWidth - innerWidth;
-  const roll = () => innerWidth - panSun.offsetWidth - panSun.offsetLeft * 2;
-  gsap.timeline({
-    scrollTrigger: { trigger: ".pan", start: "top top", end: () => `+=${distance()}`, pin: true, scrub: 1, invalidateOnRefresh: true },
-  })
-    .to(track, { x: () => -distance(), ease: "none" }, 0)
-    .to(panSun, { x: roll, rotation: () => (roll() / (Math.PI * panSun.offsetWidth)) * 360, ease: "none" }, 0);
-
-  // 5. L'éclipse : le soleil couvre l'écran, la page passe en négatif
-  gsap.timeline({ scrollTrigger: { trigger: ".eclipse", start: "top top", end: "+=180%", pin: true, scrub: 1 } })
-    .to(".eclipse__text--a", { xPercent: -40, autoAlpha: 0, ease: "none", duration: 0.45 }, 0)
-    .to(".eclipse__text--b", { xPercent: 40, autoAlpha: 0, ease: "none", duration: 0.45 }, 0)
-    .to(".eclipse__sun", { scale: 42, rotation: 25, ease: "power3.in", duration: 1 }, 0)
-    .to(".eclipse__pin", { backgroundColor: fg, ease: "none", duration: 0.12 }, 0.82)
-    .to(".eclipse__sun", { autoAlpha: 0, duration: 0.06 }, 0.94);
-
-  // Le bouton du coin s'efface quand le gros bouton « Commander » est à l'écran
-  ScrollTrigger.create({ trigger: ".btn--xl", start: "top bottom", end: "bottom top", toggleClass: { targets: ".cta", className: "is-away" } });
+  // Arrivée sur la commande : le t-shirt glisse, le prix monte
+  gsap.from(".order__tee", { xPercent: 60, rotation: 40, ease: "expo.out", duration: 1.3, scrollTrigger: { trigger: ".order", start: "top 75%" } });
+  gsap.from(".order__price", { yPercent: 25, autoAlpha: 0, ease: "expo.out", duration: 1.1, scrollTrigger: { trigger: ".order__price", start: "top 85%" } });
 
   addEventListener("load", () => ScrollTrigger.refresh());
   document.fonts?.ready.then(() => ScrollTrigger.refresh());
