@@ -196,11 +196,15 @@ h1, h2, p, ol { margin: 0; padding: 0; }
 .card:nth-child(2) { top: calc(var(--bar-h) + env(safe-area-inset-top) + 24px); }
 .card:nth-child(3) { top: calc(var(--bar-h) + env(safe-area-inset-top) + 34px); }
 .card:nth-child(4) { top: calc(var(--bar-h) + env(safe-area-inset-top) + 44px); }
+.card:nth-child(5) { top: calc(var(--bar-h) + env(safe-area-inset-top) + 54px); }
 .card__label { font-size: 15px; font-weight: 600; opacity: .7; }
 .card__value { font: 800 15vw/.88 var(--display); letter-spacing: -.055em; text-wrap: balance; }
 .card__note { font-size: 16px; line-height: 1.4; max-width: 28ch; opacity: .8; }
 .card--price { background: var(--card-a); color: var(--card-a-fg); }
 .card--price .card__value { font-size: 34vw; }
+.card__note strong { font-weight: 700; opacity: 1; }
+.card--goal { background: var(--bg); color: var(--fg); border: 3px solid var(--fg); overflow: hidden; }
+.card--goal .card__value { font-size: 52vw; line-height: .78; letter-spacing: -.07em; }
 .card--sizes { background: var(--card-b); }
 .sizes { display: flex; gap: 8px; }
 .size {
@@ -259,7 +263,9 @@ h1, h2, p, ol { margin: 0; padding: 0; }
 .order__btn span { font: 800 22px/1 var(--display); letter-spacing: -.01em; }
 .order__btn small { font-size: 13px; font-weight: 500; opacity: .7; }
 .order__btn:active { transform: scale(.98); }
-.order__note { font-size: 15px; opacity: .72; }
+.order__terms { list-style: none; margin: 4px 0 0; padding: 16px 0 0; display: grid; gap: 10px; border-top: 1px solid rgb(236 228 221 / .18); font-size: 15px; line-height: 1.45; max-width: 34ch; }
+.order__terms li { opacity: .82; }
+.order__terms strong { font-weight: 700; opacity: 1; }
 .footer {
   padding: 10svh var(--edge) calc(40px + env(safe-area-inset-bottom));
   display: grid; gap: 14px; justify-items: start;
@@ -294,6 +300,7 @@ h1, h2, p, ol { margin: 0; padding: 0; }
   .card { min-height: 52svh; padding: 36px 40px 40px; }
   .card__value, .card--vote .card__value, .card--sizes .card__value { font-size: min(9vw, 110px); }
   .card--price .card__value { font-size: min(18vw, 220px); }
+  .card--goal .card__value { font-size: min(26vw, 300px); }
   .sunset__sun { width: 22vw; margin-left: -11vw; }
   .sunset__text { font-size: 8vw; }
   .order { padding-inline: max(40px, calc((100vw - 1200px) / 2)); }
